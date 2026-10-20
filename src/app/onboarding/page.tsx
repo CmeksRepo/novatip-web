@@ -66,7 +66,7 @@ export default function OnboardingPage() {
   }, [jwt]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
+    <main id="main-content" tabIndex={-1} className="min-h-screen flex flex-col items-center justify-center px-4 py-12 outline-none">
 
       {/* Back link */}
       <div className="w-full max-w-md mb-6 flex items-center justify-between">
@@ -148,6 +148,6 @@ export default function OnboardingPage() {
         )}
 
       </div>
-    </div>
+    </main>
   );
 }
