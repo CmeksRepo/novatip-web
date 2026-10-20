@@ -30,16 +30,21 @@ export default function OnboardingPage() {
   const { isConnected, jwt, error, isSigningIn, retrySignIn } = useWallet();
   const [step, setStep] = useState(0);
   const [slug, setSlug] = useState("");
-  const [resuming, setResuming] = useState(false);
+  const [resumedJwt, setResumedJwt] = useState<string | null>(null);
+  const resuming = !!jwt && resumedJwt !== jwt;
 
   // A returning creator who already claimed a slug should not be dropped
   // back at step one. A temporary slug (the backend's default for every new
   // sign-in) means there is nothing to resume; a real one means picking up
   // at splits, or share if splits were saved too.
   useEffect(() => {
-    if (!jwt) return;
+    if (!jwt) {
+      setResumedJwt(null);
+      return;
+    }
     let cancelled = false;
-    setResuming(true);
+    setStep(0);
+    setSlug("");
 
     (async () => {
       try {
@@ -53,7 +58,7 @@ export default function OnboardingPage() {
       } catch {
         // Not resumable — fall back to starting fresh.
       } finally {
-        if (!cancelled) setResuming(false);
+        if (!cancelled) setResumedJwt(jwt);
       }
     })();
 
@@ -93,11 +98,13 @@ export default function OnboardingPage() {
         ) : (
           <>
             {/* Step indicator */}
-            <StepIndicator
-              currentStep={step}
-              totalSteps={STEP_LABELS.length}
-              labels={STEP_LABELS}
-            />
+            {!resuming && (
+              <StepIndicator
+                currentStep={step}
+                totalSteps={STEP_LABELS.length}
+                labels={STEP_LABELS}
+              />
+            )}
 
             {/* Step content */}
             <Card>
