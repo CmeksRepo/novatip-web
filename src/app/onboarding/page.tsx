@@ -19,6 +19,7 @@ import { SplitsStep }    from "@/components/onboarding/SplitsStep";
 import { ShareStep }     from "@/components/onboarding/ShareStep";
 import { ThemeToggle }   from "@/components/ThemeToggle";
 import { Card }          from "@/components/ui/Card";
+import { Button }        from "@/components/ui/Button";
 import { authApi, creatorApi } from "@/lib/api";
 import { isTempSlug } from "@/lib/onboarding";
 import Link from "next/link";
@@ -26,7 +27,7 @@ import Link from "next/link";
 const STEP_LABELS = ["Claim slug", "Set splits", "Share"];
 
 export default function OnboardingPage() {
-  const { isConnected, jwt } = useWallet();
+  const { isConnected, jwt, error, isSigningIn, retrySignIn } = useWallet();
   const [step, setStep] = useState(0);
   const [slug, setSlug] = useState("");
   const [resuming, setResuming] = useState(false);
@@ -100,7 +101,19 @@ export default function OnboardingPage() {
 
             {/* Step content */}
             <Card>
-              {resuming ? (
+              {!jwt ? (
+                <div className="flex flex-col items-center gap-4 py-4">
+                  <p className="text-sm text-fg-subtle text-center">
+                    Your wallet is connected. Sign in to continue creating your tip jar.
+                  </p>
+                  {error && (
+                    <p role="alert" className="text-sm text-danger text-center">{error}</p>
+                  )}
+                  <Button size="lg" className="w-full" loading={isSigningIn} onClick={retrySignIn}>
+                    {isSigningIn ? "Signing in..." : "Sign in"}
+                  </Button>
+                </div>
+              ) : resuming ? (
                 <p className="text-sm text-fg-subtle text-center py-8">
                   Checking your progress…
                 </p>
